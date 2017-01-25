@@ -1,0 +1,6 @@
+[package]
+name = "rustic"
+version = "0.1.0"
+authors = ["Emil Grunt <emilgrunt@gmail.com>"]
+
+[dependencies]
