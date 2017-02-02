@@ -1,4 +1,6 @@
+pub mod function;
 pub mod lexer;
+pub mod interpreter;
 
 use lexer::{ Lexer, Token };
 
