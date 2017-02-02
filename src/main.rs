@@ -3,7 +3,7 @@ pub mod lexer;
 use lexer::{ Lexer, Token };
 
 fn main() {
-    let source = "(+ 2 2)".to_string();
+    let source = "(let id (+ 2 (- 5 1)))".to_string();
     let mut lexer = Lexer::new(source, 0);
 
     loop {
@@ -14,9 +14,11 @@ fn main() {
         }
 
         match current {
+            Token::Identifier(identifier) => println!("Token: Identifier({})", identifier),
+            Token::Let => println!("Token: Keyword Let"),
             Token::OpenParen => println!("Token: ("),
             Token::CloseParen => println!("Token: )"),
-            Token::Number { i } => println!("Token: Number({})", i),
+            Token::Number(number) => println!("Token: Number({})", number),
             Token::Plus => println!("Token: +"),
             Token::Minus => println!("Token: -"),
             _ => println!("Unknown token"),

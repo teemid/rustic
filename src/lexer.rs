@@ -1,11 +1,16 @@
 #[derive(Debug, PartialEq)]
 pub enum Token {
-    Identifier { name: String },
-    Number { i: i64 },
+    Identifier(String),
+    Number(i64),
     OpenParen,
     CloseParen,
     Plus,
     Minus,
+    Multiply,
+    Divide,
+    // NOTE (Emil): I don't know if this is the best way of doing things but let's try.
+    Let,
+    Quote,
     EOF,
 }
 
@@ -37,6 +42,9 @@ impl Lexer {
             ')' => Token::CloseParen,
             '+' => Token::Plus,
             '-' => Token::Minus,
+            '*' => Token::Multiply,
+            '/' => Token::Divide,
+            '\'' => Token::Quote,
             'a' ... 'z' | 'A' ... 'Z' | '_' => self.identifier(c),
             '0' ... '9' => self.number(c),
             _ => panic!("Invalid character {}", c),
@@ -51,7 +59,10 @@ impl Lexer {
             _ => false,
         });
 
-        return Token::Identifier { name: identifier };
+        match identifier.as_ref() {
+            "let" => Token::Let,
+            _ => Token::Identifier(identifier),
+        }
     }
 
     fn number(&mut self, first: char) -> Token {
@@ -62,7 +73,7 @@ impl Lexer {
             _ => false,
         });
 
-        return Token::Number { i: number.parse().unwrap() };
+        return Token::Number(number.parse().unwrap());
     }
 
     fn consume_whitespace(&mut self) {
