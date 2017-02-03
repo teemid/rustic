@@ -27,7 +27,7 @@ impl Function {
         index
     }
 
-    pub fn get_instruction(&mut self, index: usize) -> u32 {
+    pub fn fetch_instruction(&mut self, index: usize) -> u32 {
         self.instructions[index]
     }
 }
