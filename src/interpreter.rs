@@ -12,6 +12,7 @@ pub enum Instruction {
     Jump,
     JumpIfEqual,
     JumpIfNotEqual,
+    End,
 }
 
 #[derive(Debug)]
@@ -24,8 +25,28 @@ pub struct Interpreter {
 }
 
 impl Interpreter {
+    pub fn new() -> Interpreter {
+        Interpreter {
+            constants: vec![],
+            instruction_pointer: 0,
+            stack: vec![],
+            local_variables: vec![],
+            instructions: vec![]
+        }
+    }
+
+    pub fn add_constant(&mut self, constant: u32) {
+        self.constants.push(constant);
+    }
+
+    pub fn add_instruction(&mut self, instruction: u32) {
+        self.instructions.push(instruction);
+    }
+
     pub fn run(&mut self) {
         loop {
+            println!("{:?}", self.stack);
+
             match self.next_instruction() {
                 Instruction::LoadConstant   => self.load_constant(),
                 Instruction::LoadLocal      => self.load_local(),
@@ -37,13 +58,13 @@ impl Interpreter {
                 Instruction::Jump           => self.do_jump(),
                 Instruction::JumpIfEqual    => self.jump_if_equal(),
                 Instruction::JumpIfNotEqual => self.jump_if_not_equal(),
-                // _ => panic!("Unknown instruction"),
+                Instruction::End            => break,
             }        
         }
     }
 
     fn next_instruction(&mut self) -> Instruction {
-        let instruction = match self.instructions[self.instruction_pointer] {
+        match self.next() {
             0 => Instruction::LoadConstant,
             1 => Instruction::Add,
             2 => Instruction::Subtract,
@@ -52,12 +73,9 @@ impl Interpreter {
             5 => Instruction::Jump,
             6 => Instruction::JumpIfEqual,
             7 => Instruction::JumpIfNotEqual,
+            8 => Instruction::End,
             _ => panic!("Illegal instruction"),
-        };
-
-        self.instruction_pointer += 1;
-
-        instruction
+        }
     }
 
     fn next_value(&mut self) -> u32 {
@@ -69,7 +87,7 @@ impl Interpreter {
     }
 
     fn load_constant(&mut self) {
-        let index = self.pop();
+        let index = self.next();
 
         match self.constants.get(index as usize) {
             Some(constant) => self.stack.push(constant.clone()),
@@ -77,12 +95,17 @@ impl Interpreter {
         }
     }
 
-    fn load_local(&self) {
+    fn load_local(&mut self) {
+        let index = self.next();
+
+        self.stack.push(self.constants[index as usize]);
     }
 
     fn store_local(&mut self) {
         let value = self.pop();
-        let index = self.pop();
+        let index = self.next();
+
+        self.local_variables[index as usize] = value;
     }
 
     fn add(&mut self) {
@@ -115,14 +138,26 @@ impl Interpreter {
 
     fn do_jump(&mut self) {
         let target = self.pop();
+
+        self.instruction_pointer = target as usize;
     }
 
     fn jump_if_equal(&mut self) {
-
+        
     }
 
     fn jump_if_not_equal(&mut self) {
 
+    }
+
+    fn next(&mut self) -> u32 {
+        let instruction = self.instructions.get(self.instruction_pointer);
+        self.instruction_pointer += 1;
+
+        match instruction {
+            Some(instruction) => instruction.clone(),
+            None => 8
+        }
     }
 
     fn pop(&mut self) -> u32 {
