@@ -1,9 +1,11 @@
 pub mod function;
 pub mod lexer;
 pub mod interpreter;
+pub mod parser;
 
 use lexer::{ Lexer, Token };
 use interpreter::{ Interpreter };
+
 
 fn main() {
     let source = "(+ 1 2 3 4)".to_string();
@@ -38,8 +40,6 @@ fn main() {
     interpreter.add_instruction(0);
     interpreter.add_instruction(1);
     interpreter.add_instruction(3);
-
-    print!("{:?}", interpreter);
 
     interpreter.run();
 }
