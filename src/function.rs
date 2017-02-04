@@ -1,5 +1,4 @@
 use std::collections::{ HashMap };
-use std::ops::Sub;
 
 #[derive(Debug)]
 pub struct Function {

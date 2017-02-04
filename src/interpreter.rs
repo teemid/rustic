@@ -1,19 +1,30 @@
-use function::{ Function };
+type Instruction = u32;
 
-#[derive(Debug)]
-pub enum Instruction {
-    LoadConstant,
-    LoadLocal,
-    StoreLocal,
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    Jump,
-    JumpIfEqual,
-    JumpIfNotEqual,
-    End,
-}
+const LOAD_CONSTANT:     Instruction = 0;
+const LOAD_LOCAL:        Instruction = 1;
+const STORE_LOCAL:       Instruction = 2;
+const ADD:               Instruction = 3;
+const SUBTRACT:          Instruction = 4;
+const MULTIPLY:          Instruction = 5;
+const DIVIDE:            Instruction = 6;
+const JUMP:              Instruction = 7;
+const JUMP_IF_EQUAL:     Instruction = 8;
+const JUMP_IF_NOT_EQUAL: Instruction = 9;
+const END:               Instruction = 10;
+
+const INSTRUCTION_NAMES: [&'static str; 11] = [
+    "LoadConstant",
+    "LoadLocal",
+    "StoreLocal",
+    "Add",
+    "Subtract",
+    "Multiply",
+    "Divide",
+    "Jump",
+    "JumpIfEqual",
+    "JumpIfNotEqual",
+    "End",
+];
 
 #[derive(Debug)]
 pub struct Interpreter {
@@ -47,43 +58,21 @@ impl Interpreter {
         loop {
             println!("{:?}", self.stack);
 
-            match self.next_instruction() {
-                Instruction::LoadConstant   => self.load_constant(),
-                Instruction::LoadLocal      => self.load_local(),
-                Instruction::StoreLocal     => self.store_local(),
-                Instruction::Add            => self.add(),
-                Instruction::Subtract       => self.subtract(),
-                Instruction::Multiply       => self.multiply(),
-                Instruction::Divide         => self.divide(),
-                Instruction::Jump           => self.do_jump(),
-                Instruction::JumpIfEqual    => self.jump_if_equal(),
-                Instruction::JumpIfNotEqual => self.jump_if_not_equal(),
-                Instruction::End            => break,
+            match self.next() as Instruction {
+                LOAD_CONSTANT     => self.load_constant(),
+                LOAD_LOCAL        => self.load_local(),
+                STORE_LOCAL       => self.store_local(),
+                ADD               => self.add(), 
+                SUBTRACT          => self.subtract(),
+                MULTIPLY          => self.multiply(),
+                DIVIDE            => self.divide(),
+                JUMP              => self.jump(),
+                JUMP_IF_EQUAL     => self.jump_if_equal(),
+                JUMP_IF_NOT_EQUAL => self.jump_if_not_equal(),
+                END               => break,
+                _ => panic!("Illegal instruction"),
             }        
         }
-    }
-
-    fn next_instruction(&mut self) -> Instruction {
-        match self.next() {
-            0 => Instruction::LoadConstant,
-            1 => Instruction::Add,
-            2 => Instruction::Subtract,
-            3 => Instruction::Multiply,
-            4 => Instruction::Divide,
-            5 => Instruction::Jump,
-            6 => Instruction::JumpIfEqual,
-            7 => Instruction::JumpIfNotEqual,
-            8 => Instruction::End,
-            _ => panic!("Illegal instruction"),
-        }
-    }
-
-    fn next_value(&mut self) -> u32 {
-        let value = self.instructions[self.instruction_pointer];
-
-        self.instruction_pointer += 1;
-
-        value
     }
 
     fn load_constant(&mut self) {
@@ -136,7 +125,7 @@ impl Interpreter {
         self.push(b / a);
     }
 
-    fn do_jump(&mut self) {
+    fn jump(&mut self) {
         let target = self.pop();
 
         self.instruction_pointer = target as usize;
@@ -156,7 +145,7 @@ impl Interpreter {
 
         match instruction {
             Some(instruction) => instruction.clone(),
-            None => 8
+            None => END,
         }
     }
 
