@@ -2,6 +2,7 @@ use std::collections::{ HashMap };
 
 #[derive(Debug)]
 pub struct Function {
+    identifier: String,
     instructions: Vec<u32>,
     constants: Vec<u32>,
     identifiers: HashMap<String, usize>,
